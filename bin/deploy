@@ -1,0 +1,2 @@
+gcloud config set project jd-rank
+gcloud app deploy app.yaml

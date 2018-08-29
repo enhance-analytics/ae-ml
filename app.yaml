@@ -1,0 +1,7 @@
+runtime: python37
+service: iris
+
+handlers:
+- url: /(.*)
+  script: main.app
+  secure: always
