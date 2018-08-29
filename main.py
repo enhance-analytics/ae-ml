@@ -62,12 +62,20 @@ def train_model():
         'confusion_matrix': cm.__str__(),
         'accuracy': model.score(test_x, test_y),
         'coeffs': model.coef_[0].__str__(),
+
     }
 
     logging.info('[main.train_model] model_outputs - %s', model_outputs)
 
-    filename = '/tmp/{model_name}.pkl'.format(model_name='iris_LR')
+    # filename = '/tmp/{model_name}.pkl'.format(model_name='iris_LR')
+    filename = '{model_name}.pkl'.format(model_name='iris_LR')
     pickle.dump(model, open(filename, 'wb'))
+
+    with open(filename, 'rb') as handle:
+        b = pickle.load(handle)
+        print('b:', b.__str__())
+
+    # return b
 
     return jsonify(model_outputs)
 
@@ -97,7 +105,7 @@ def predict_random():
 
 def predict(data, features):
     """load the model from disk, make the prediction"""
-    filename = '/tmp/{model_name}.pkl'.format(model_name=MODEL_NAME)
+    filename = '{model_name}.pkl'.format(model_name=MODEL_NAME)
     loaded_model = pickle.load(open(filename, 'rb'))
 
     test_df = pd.DataFrame(data, columns=features)
@@ -125,8 +133,12 @@ def get_ran_float():
 
 
 if __name__ == '__main__':
-    # for local development
-    app.run(host='127.0.0.1', port=8080, debug=True)
+    # # for local development
+    # app.run(host='127.0.0.1', port=8080, debug=True)
+
+    # with docker
+    app.run(host='0.0.0.0', port=8080, debug=True)
+
 
 # https://cloud.google.com/appengine/docs/standard/python3/quickstart
 # https://machinelearningmastery.com/save-load-machine-learning-models-python-scikit-learn/
