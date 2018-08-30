@@ -18,6 +18,7 @@ TRAIN_PCT = 0.7
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def home():
     """Welcome Screen"""
@@ -41,7 +42,7 @@ def train_model():
     # shuffle dataset
     df = df.sample(frac=1).reset_index(drop=True)
 
-    # perform train/test split..
+    # perform train/test split
     split_pt = int(TRAIN_PCT * len(df))
 
     train_x = df[:split_pt].drop(u'target', 1)  # training features
@@ -50,8 +51,8 @@ def train_model():
     test_x = df[split_pt:].drop(u'target', 1)  # test features
     test_y = df[split_pt:].target  # test target
 
-    logging.info('[main.train_model] fitting model for %s rows', len(train_x))
     # fit the model to the dataset
+    logging.info('[main.train_model] fitting model for %s rows', len(train_x))
     model = LR()
     model.fit(train_x, train_y)
 
@@ -67,15 +68,8 @@ def train_model():
 
     logging.info('[main.train_model] model_outputs - %s', model_outputs)
 
-    # filename = '/tmp/{model_name}.pkl'.format(model_name='iris_LR')
     filename = '{model_name}.pkl'.format(model_name='iris_LR')
     pickle.dump(model, open(filename, 'wb'))
-
-    with open(filename, 'rb') as handle:
-        b = pickle.load(handle)
-        print('b:', b.__str__())
-
-    # return b
 
     return jsonify(model_outputs)
 
@@ -88,9 +82,8 @@ def predict_random():
     API would generate and send to this service
     """
 
-    # iris = load_iris()
     features = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']
-    data = [[get_ran_float() for x in range(4)]]
+    data = [[get_rand_float() for x in range(len(features))]]
 
     logging.info('[predict_random] %s ', data)
 
@@ -112,7 +105,9 @@ def predict(data, features):
 
     return loaded_model.predict(test_df)
 
+
 def get_iris():
+    """Bring the iris data from the scikit learn package into a dataframe"""
 
     iris = load_iris()
     rows = np.c_[iris['data'], iris['target']]
@@ -127,17 +122,18 @@ def get_iris():
 
     return df
 
-def get_ran_float():
+
+def get_rand_float():
 
     return random.uniform(1.0, 4.0)
 
 
 if __name__ == '__main__':
-    # # for local development
-    # app.run(host='127.0.0.1', port=8080, debug=True)
+    # for local development
+    app.run(host='127.0.0.1', port=8080, debug=True)
 
-    # with docker
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    # # with docker
+    # app.run(host='0.0.0.0', port=8080, debug=True)
 
 
 # https://cloud.google.com/appengine/docs/standard/python3/quickstart
